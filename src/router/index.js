@@ -1,12 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import routes from './routes'
 
 Vue.use(VueRouter)
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 /*
  * If not building with SSR mode, you can
