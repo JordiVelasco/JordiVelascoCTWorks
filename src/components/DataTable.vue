@@ -40,29 +40,47 @@
               />
             </q-popup-edit>
           </q-td>
-          <q-td key="value" :props="props">
-            {{ props.row.value }}
-            <q-popup-edit
-              v-model="props.row.value"
-              title="Edit the Name"
-              auto-save
-              v-slot="scope"
-            >
-              <q-input
-                v-model="scope.value"
-                dense
-                autofocus
-                counter
-                @keyup.enter="scope.set"
-              />
-            </q-popup-edit>
+          <q-td class="custom-row" key="value" :props="props">
+            <template v-if="typeof props.row.value === 'object'">
+              <q-tr >
+                <q-td
+                  v-for="(val, key) in props.row.value"
+                  :key="key"
+                >
+                  {{ `${key}: ${val}` }}
+                </q-td>
+              </q-tr>
+            </template>
+            <template v-else>
+              {{ props.row.value }}
+              <q-popup-edit
+                v-model="props.row.value"
+                title="Edit the Name"
+                auto-save
+                v-slot="scope"
+              >
+                <q-input
+                  v-model="scope.value"
+                  dense
+                  autofocus
+                  counter
+                  @keyup.enter="scope.set"
+                />
+              </q-popup-edit>
+            </template>
           </q-td>
         </q-tr>
       </template>
     </q-table>
   </div>
 </template>
-
+<style scoped>
+.custom-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
 <script>
 const columns = [
   {
@@ -86,7 +104,7 @@ const data = [
   },
   {
     label: "value_2",
-    value: "A: 32 B: 54",
+    value: { A: 32, B: 54 },
   },
   {
     label: "value_3",
