@@ -1,95 +1,126 @@
 <template>
   <div class="q-pa-md">
-    <q-table title="Treats" :data="data" :columns="columns" row-key="id">
-      <template v-slot:top>
-        <q-btn
-          color="primary"
-          :disable="loading"
-          label="Add row"
-          @click="openDialog"
-        />
-        <q-space />
-      </template>
-    </q-table>
-
-    <q-dialog v-model="dialog" persistent>
+    <q-btn @click="openDialog" label="Agregar Nueva Fila" color="primary" />
+    <q-dialog v-model="dialogVisible">
       <q-card>
         <q-card-section>
           <q-input v-model="newRow.value" label="Data value" />
         </q-card-section>
-        <q-card-actions align="right">
-          <q-btn label="Cancel" color="primary" @click="closeDialog" />
-          <q-btn label="Add" color="positive" @click="addCustomRow" />
+        <q-card-actions>
+          <q-btn label="Cancelar" color="negative" @click="closeDialog" />
+          <q-btn label="Agregar" color="positive" @click="addCustomRow" />
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <q-table
+      :data="data"
+      :columns="columns"
+      virtual-scroll
+      :rows-per-page-options="[0]"
+      row-key="name"
+      separator="cell"
+    >
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td key="label" :props="props">
+            {{ props.row.label }}
+            <q-popup-edit
+              v-model="props.row.label"
+              title="Edit the Name"
+              auto-save
+              v-slot="scope"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="value" :props="props">
+            {{ props.row.value }}
+            <q-popup-edit
+              v-model="props.row.value"
+              title="Edit the Name"
+              auto-save
+              v-slot="scope"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
+          </q-td>
+        </q-tr>
+      </template>
+    </q-table>
   </div>
 </template>
 
 <script>
+const columns = [
+  {
+    name: "label",
+    align: "center",
+    label: "Field label",
+    field: "label",
+  },
+  {
+    name: "value",
+    align: "center",
+    label: "Data value",
+    field: "value",
+  },
+];
+
+const data = [
+  {
+    label: "value_1",
+    value: 343,
+  },
+  {
+    label: "value_2",
+    value: "A: 32 B: 54",
+  },
+  {
+    label: "value_3",
+    value: 6343,
+  },
+];
+
 export default {
   data() {
     return {
+      dialogVisible: false,
       loading: false,
       filter: "",
-      rowCount: 10,
-      columns: [
-        {
-          name: "desc",
-          required: true,
-          label: "Field Label",
-          align: "left",
-          field: (row) => "value_" + row.label,
-          format: (val) => `${val}`,
-          sortable: true,
-        },
-        {
-          name: "desc",
-          required: true,
-          label: "Data Value",
-          align: "left",
-          field: (row) => row.value,
-          format: (val) => `${val}`,
-          sortable: true,
-        },
-      ],
-      data: [
-        { id: 1, label: 1, value: '343' },
-        { id: 2, label: 2, value: 'A: 32 B: 54' },
-        { id: 3, label: 3, value: '6343' },
-      ],
-      dialog: false,
+      data,
+      columns,
       newRow: { label: 3, value: "" },
     };
   },
   methods: {
     openDialog() {
-      this.dialog = true;
+      this.dialogVisible = true;
     },
     closeDialog() {
-      this.dialog = false;
+      this.dialogVisible = false;
     },
     addCustomRow() {
-      if (this.newRow.value) {
+      if (this.newRow.value !== undefined) {
         const newRow = {
-          id: ++this.rowCount,
-          label: ++this.newRow.label,
+          label: "value_" + ++this.newRow.label,
           value: this.newRow.value,
         };
         this.data.push(newRow);
         this.closeDialog();
       }
-    },
-    removeRow() {
-      this.loading = true;
-      setTimeout(() => {
-        const index = Math.floor(Math.random() * this.data.length);
-        this.data = [
-          ...this.data.slice(0, index),
-          ...this.data.slice(index + 1),
-        ];
-        this.loading = false;
-      }, 500);
     },
   },
 };
