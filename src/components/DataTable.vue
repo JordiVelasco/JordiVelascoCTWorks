@@ -1,5 +1,6 @@
 <template>
   <div class="q-pa-md">
+    <ExportToPDFButton :data="data" />
     <q-btn @click="openDialog" label="Agregar Nueva Fila" color="primary" />
     <q-dialog v-model="preguntaNombreValors">
       <q-card>
@@ -98,6 +99,7 @@
 }
 </style>
 <script>
+import ExportToPDFButton from './ExportToPDFButton.vue';
 const columns = [
   {
     name: "label",
@@ -129,6 +131,9 @@ const data = [
 ];
 
 export default {
+  components: {
+    ExportToPDFButton
+  },
   data() {
     return {
       preguntaNombreValors: false,
