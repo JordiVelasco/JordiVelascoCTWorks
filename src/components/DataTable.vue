@@ -1,14 +1,33 @@
 <template>
   <div class="q-pa-md">
     <q-btn @click="openDialog" label="Agregar Nueva Fila" color="primary" />
-    <q-dialog v-model="dialogVisible">
+    <q-dialog v-model="preguntaNombreValors">
       <q-card>
         <q-card-section>
-          <q-input v-model="newRow.value" label="Data value" />
+          <q-input v-model="nCells" label="Numero de valores: (max 2)" />
         </q-card-section>
         <q-card-actions>
           <q-btn label="Cancelar" color="negative" @click="closeDialog" />
-          <q-btn label="Agregar" color="positive" @click="addCustomRow" />
+          <q-btn label="Agregar" color="positive" @click="manyCells" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <q-dialog v-model="dialogVisible">
+      <q-card>
+        <q-card-section>
+          <q-input
+            v-if="nCells == 1"
+            v-model="newRow.value"
+            label="Data value"
+          />
+          <div v-else>
+            <q-input v-model="newRow.value1" label="Data value 1" />
+            <q-input v-model="newRow.value2" label="Data value 2" />
+          </div>
+        </q-card-section>
+        <q-card-actions>
+          <q-btn label="Cancelar" color="negative" @click="closeDialog" />
+          <q-btn label="Aceptar" color="positive" @click="addCustomRow" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -27,7 +46,7 @@
             {{ props.row.label }}
             <q-popup-edit
               v-model="props.row.label"
-              title="Edit the Name"
+              title="Nuevo nombre"
               auto-save
               v-slot="scope"
             >
@@ -42,32 +61,29 @@
           </q-td>
           <q-td class="custom-row" key="value" :props="props">
             <template v-if="typeof props.row.value === 'object'">
-              <q-tr >
-                <q-td
-                  v-for="(val, key) in props.row.value"
-                  :key="key"
-                >
+              <q-tr>
+                <q-td v-for="(val, key) in props.row.value" :key="key">
                   {{ `${key}: ${val}` }}
                 </q-td>
               </q-tr>
             </template>
             <template v-else>
               {{ props.row.value }}
-              <q-popup-edit
-                v-model="props.row.value"
-                title="Edit the Name"
-                auto-save
-                v-slot="scope"
-              >
-                <q-input
-                  v-model="scope.value"
-                  dense
-                  autofocus
-                  counter
-                  @keyup.enter="scope.set"
-                />
-              </q-popup-edit>
             </template>
+            <q-popup-edit
+              v-model="props.row.value"
+              title="Nuevo valor"
+              auto-save
+              v-slot="scope"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
           </q-td>
         </q-tr>
       </template>
@@ -115,20 +131,26 @@ const data = [
 export default {
   data() {
     return {
+      preguntaNombreValors: false,
       dialogVisible: false,
       loading: false,
       filter: "",
       data,
       columns,
+      nCells: 0,
       newRow: { label: 3, value: "" },
     };
   },
   methods: {
     openDialog() {
-      this.dialogVisible = true;
+      this.preguntaNombreValors = true;
     },
     closeDialog() {
+      this.preguntaNombreValors = false;
       this.dialogVisible = false;
+    },
+    manyCells() {
+      this.dialogVisible = true;
     },
     addCustomRow() {
       if (this.newRow.value !== undefined) {
