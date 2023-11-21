@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <ExportToPDFButton :data="data" />
+    <ExportToPDFButton :data="dataWithProcessedValues" />
     <q-btn @click="openDialog" label="Agregar Nueva Fila" color="primary" />
     <q-dialog v-model="preguntaNombreValors">
       <q-card>
@@ -146,6 +146,15 @@ export default {
       newRow: { label: 3, value: "" },
     };
   },
+  computed: {
+    // Añadir una propiedad computada para generar data con valores procesados
+    dataWithProcessedValues() {
+      return this.data.map(row => ({
+        ...row,
+        processedValues: this.getProcessedValues(row.value),
+      }));
+    },
+  },
   methods: {
     openDialog() {
       this.preguntaNombreValors = true;
@@ -167,6 +176,12 @@ export default {
         this.closeDialog();
       }
     },
+    getProcessedValues(value) {
+    if (typeof value === 'object') {
+      return Object.entries(value).map(([key, val]) => `${key}: ${val}`).join(', ');
+    }
+    return value;
+  },
   },
 };
 </script>
